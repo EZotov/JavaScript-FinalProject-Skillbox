@@ -1,0 +1,114 @@
+@media (max-width: 1919px) {
+  .fixed-container {
+    width: 860px;
+  }
+
+  .imageListItem__image {
+     max-width: 280px;
+  }
+  .imageListItemHoverBlock {
+    font-size: 12px;
+    padding: 5px 5px 5px 30px
+  }
+
+  .imageListItemHoverBlock__likes, .imageListItemHoverBlock__date, .imageListItemHoverBlock__link {
+    padding: 5px 0;
+  }
+
+  .popupPhotoContainer
+    .popupPhotoContainer__image {
+      max-height: 600px;
+    }
+
+  .popupPhotoContainer__prevImage, .popupPhotoContainer__nextImage,.popupPhotoContainer__closeLink {
+    width: 30px;
+    height: 30px;
+  }
+
+  .photoOwnerInfoWrapper__link {
+    font-size: 16px;
+  }
+  .photoOwnerInfoWrapper__date {
+    font-size: 14px;
+  }
+
+  .likeBtn {
+    font-size: 12px;
+    height: 40px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .fixed-container {
+    width: 570px;
+  }
+
+  .popupPhotoContainer
+    .popupPhotoContainer__image {
+      max-height: 400px;
+    }
+
+  .likeBtn {
+    font-size: 10px;
+    height: 30px;
+    }
+
+  .authorizationBlock__button {
+    font-size: 16px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .fixed-container {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .imageList {
+    margin:0 auto;
+  }
+
+  .personInfo {
+    display: none;
+  }
+
+  .header
+    .headerContainer {
+    justify-content: center;
+  }
+
+  .mainHeadline {
+    font-size: 20px;
+  }
+
+  .popupPhotoContainer__prevImage, .popupPhotoContainer__nextImage,.popupPhotoContainer__closeLink {
+    width: 20px;
+    height: 20px;
+  }
+
+  .popupPhotoContainer {
+    min-width: 235px;
+  }
+
+  .photoInfoContainer {
+    line-height: 10px;
+  }
+
+  .likeBtn {
+    font-size: 8px;
+    height: 25px;
+  }
+
+  .imageListItem:hover
+    .imageListItemHoverBlock {
+      opacity: 0;
+  }
+
+  .imageListItem:hover {
+    transform: none;
+  }
+
+
+}

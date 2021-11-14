@@ -1,0 +1,247 @@
+
+
+
+
+.header {
+  background: #ffffff;
+  box-shadow: 0px 0px 8px 0px #c4c4c4;
+  .headerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mainHeadline {
+    margin: 0;
+    padding: 20px 0px 20px 0px;
+
+  }
+  .personInfo__name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d5074;
+  }
+}
+
+
+
+.mainGalleryContainer {
+  background: #f0f0f0;
+}
+
+.galleryContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.galleryContainer__button {
+  width: 200px;
+  border: none;
+  background: #0f4767;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 10px 20px;
+  transition: ease all 0.5s;
+  &:hover {
+    transition: ease all 0.5s;
+    background: #ee640b;
+  }
+}
+
+.galleryBlock {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  @extend .header;
+}
+
+.imageList {
+  list-style: none;
+  padding: 10px 0;
+}
+
+.imageListItem {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: ease all 0.2s;
+  z-index: 1;
+  &:hover {
+    transition: ease all 0.3s;
+    transform: scale(1.05);
+  }
+  &:hover
+    .imageListItemHoverBlock {
+      opacity: 1;
+      transition: ease all 0.3s;
+  }
+}
+
+.imageListItemHoverBlock {
+  position: absolute;
+  bottom: 20%;
+  left: -20px;
+  padding: 10px 10px 10px 30px;
+  opacity: 0;
+  max-width: 300px;
+  min-height: 100px;
+  border-radius: 25px;
+  background: rgba(#202020, 0.86);
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  transition: ease all 0.2s;
+  .imageListItemHoverBlock__likes, .imageListItemHoverBlock__date, .imageListItemHoverBlock__link {
+    padding: 10px 0;
+  }
+  .imageListItemHoverBlock__likes {
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+  }
+}
+
+
+  .imageListItem__image {
+    max-width: 350px;
+    object-fit: cover;
+  }
+
+
+
+.authorizationBlock {
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.authorizationBlock__button {
+  padding: 10px 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #272927;
+}
+
+.popupModal {
+  display: block;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #0e0e0ef0;
+  z-index: 100;
+}
+
+.popupPhotoContainer {
+  display: flex;
+  flex-direction: column;
+  background: #f7f7f7;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 1440px;
+  .popupPhotoContainer__image {
+    max-height: 1000px;
+  }
+  .photoInfoContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    order: -1;
+    .photoOwnerInfo {
+      display: flex;
+      align-items: center;
+      .photoOwnerInfoWrapper {
+        display: flex;
+        flex-direction: column;
+        margin-left: 20px;
+        .photoOwnerInfoWrapper__date {
+
+        }
+      }
+    }
+  }
+}
+
+.photoOwnerInfoWrapper__link {
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 20px;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.popupPhotoContainer__prevImage {
+  position: absolute;
+  top: 50%;
+  left: -15%;
+  color: #ffffff;
+  background: url('../icons/keyboard-right-arrow-button-1_icon-icons.svg') no-repeat;
+  transform: rotate(180deg);
+  width: 60px;
+  height: 60px;
+  background-color: #d6d6d6;
+  background-position: center;
+  background-size: 70%;
+  cursor: pointer;
+ }
+
+.popupPhotoContainer__nextImage {
+  position: absolute;
+  color: #ffffff;
+  top:50%;
+  right: -15%;
+  background: url('../icons/keyboard-right-arrow-button-1_icon-icons.svg') no-repeat;
+  width: 60px;
+  height: 60px;
+  background-color: #d6d6d6;
+  background-position: center;
+  background-size: 70%;
+  cursor: pointer;
+}
+
+.popupPhotoContainer__closeLink {
+  color: #ffffff;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: url('../icons/1487086345-cross_81577.png') no-repeat;
+  width: 60px;
+  height: 60px;
+  background-color: #d6d6d6;
+  background-position: center;
+  background-size: 70%;
+  cursor: pointer;
+}
+
+.likeBtn {
+  padding: 5px 25px;
+  font-size: 20px;
+  height: 50px;
+  border-radius: 25px;
+  color: #ffffff;
+  background: #131313;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.likeBtn_active {
+  background: #b11122;
+}
+
+.disable-scroll {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+}

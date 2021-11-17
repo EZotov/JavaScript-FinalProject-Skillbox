@@ -222,7 +222,9 @@
 
 .likeBtn {
   padding: 5px 25px;
+  border: none;
   font-size: 20px;
+  min-width: 40px;
   height: 50px;
   border-radius: 25px;
   color: #ffffff;
@@ -244,4 +246,35 @@
   left: 0;
   top: 0;
   width: 100%;
+}
+
+.errorContainer {
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  top: 10%;
+  transform: translate(-50%);
+  z-index:100;
+  background: #d8d6d6eb;
+  border: 1px solid #f44f4f;
+  border-radius: 10px;
+  padding: 10px 20px;
+  max-width: 600px;
+
+  .errorContainer__headline {
+
+  }
+  .errorContainer__errortext {
+    font-size: 18px;
+    padding: 5px;
+    background: #ffffff94;
+    font-weight: bold;
+  }
+  .errorContainer__accept {
+    border: none;
+    padding: 10px 20px;
+    font-size: 20px;
+    cursor: pointer;
+
+  }
 }

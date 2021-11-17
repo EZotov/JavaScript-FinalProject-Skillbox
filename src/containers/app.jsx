@@ -4,7 +4,7 @@ import Header from '../components/header.jsx';
 import {Authorization, unsplash} from './authorization.jsx';
 import Gallery from './gallery.jsx';
 import {getCookie,setCookie,delCookie} from '../cookie.js';
-import {setUserInfo} from '../reducers/actions.js';
+import {setUserInfo,requestResultClear} from '../redux/actions.js';
 import {useSelector, useDispatch} from 'react-redux';
 import '../css/normalize.css';
 import '../css/primarystyles.css';
@@ -12,7 +12,7 @@ import '../scss/app.scss';
 import '../scss/media.scss';
 
 
-function GalleryApp() {
+function GalleryApp(props) {
   const state = useSelector((state) => state);
   const history = useHistory();
   const dispatch = useDispatch();
@@ -25,6 +25,17 @@ function GalleryApp() {
     dispatch(setUserInfo(user));
   };
 
+  let errorMessageConcate = '';
+  if (state.errorMessage) {
+    state.errorMessage.forEach((item, i) => {
+      errorMessageConcate = item + ';';
+    });
+  }
+
+
+  const onClickErrorCloseBtn = () => {
+    dispatch(requestResultClear());
+  };
 
   const getCurrentUser = (unsplash) => {
     if (!state.userInfo) {
@@ -73,6 +84,15 @@ function GalleryApp() {
       <Route path='/main'>
         <Gallery state={state}/>
       </Route>
+      {
+        state.errorMessage ? (
+          <div className ='errorContainer'>
+            <h2 className='errorContainer__headline'>Ошибка</h2>
+            <p className='errorContainer__errortext'>{errorMessageConcate}</p>
+            <button aria-label='Закрыть окно ошибки' type='button' className='errorContainer__accept' onClick={() => onClickErrorCloseBtn()}>ok</button>
+          </div>
+        ): ''
+      }
     </div>
   )
 }

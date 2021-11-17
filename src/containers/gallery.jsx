@@ -1,8 +1,8 @@
 import React from 'react';
 import {unsplash} from './authorization.jsx';
 import Popup from '../components/popup.jsx';
-import {Switch, Route, Link} from "react-router-dom";
-import {addImages, changeImageData} from '../reducers/actions.js';
+import {Switch, Route, Link, useLocation,useHistory} from "react-router-dom";
+import {addImages, changeImageData} from '../redux/actions.js';
 import {useSelector, useDispatch} from 'react-redux';
 import Masonry from 'react-masonry-component';
 import {format} from 'date-fns';
@@ -15,7 +15,6 @@ let isLoadingImagesEnable = false;
 let moreImagesBtn;
 let imagesListElem;
 let positionYImagesListElem;
-
 
 const getCoordsOfElement = (elem) => {
   const element = elem.getBoundingClientRect();
@@ -30,6 +29,7 @@ const getCoordsOfElement = (elem) => {
 function Gallery(props) {
   const {state} = props;
   const dispatch = useDispatch();
+  const history = useHistory();
   const ref = React.useRef(null);
 
   let galleryHeight;
@@ -38,12 +38,10 @@ function Gallery(props) {
   const addPhotos = (photos) => {
     dispatch(addImages(photos));
   };
-  const updatePhoto = (photo) => {
-    dispatch(changeImageData(photo));
-  };
 
+  let id = location.pathname.split('image/')[1];
 
-
+  //Запрос
   if (!state.images.length && state.userInfo) {
     unsplash.photos.listPhotos(page, perPageItemsCount, 'latest')
       .then(res => res.json())
@@ -51,12 +49,16 @@ function Gallery(props) {
           if (!res.errors) {
              photos = res;
              addPhotos(photos);
+             if (id) {
+               history.push('/main/image/' + id);
+             }
           }
           else {
             console.log(res.errors);
           }
       });
   }
+
 
   const loadMoreImages = () => {
     page++;
@@ -72,6 +74,7 @@ function Gallery(props) {
           }
       });
   };
+
 
 
   React.useEffect(() => {
@@ -127,10 +130,7 @@ function Gallery(props) {
       </div>
 
       <Route path='/main/image'>
-        <Popup
-          state={state}
-          updatePhoto={updatePhoto}
-        />
+        <Popup state={state}/>
       </Route>
     </main>
   );

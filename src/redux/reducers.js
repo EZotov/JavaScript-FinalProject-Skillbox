@@ -23,7 +23,32 @@ const reducer = (state, action) => {
       images:newImages,
       userInfo:state.userInfo,
     };
-  
+
+    case 'REQUEST_SENDING':
+    return {
+      images:state.images,
+      userInfo: state.userInfo,
+      requestStatus:'sent',
+    };
+    case 'REQUEST_SUCCESS':
+    return {
+      images:state.images,
+      userInfo: state.userInfo,
+      requestStatus:'success',
+    };
+    case 'REQUEST_ERROR':
+    return {
+      images:state.images,
+      userInfo: state.userInfo,
+      requestStatus:'failure',
+      errorMessage:action.errorMessage,
+    };
+    case 'ERROR_CLEAR':
+    return {
+      images:state.images,
+      userInfo: state.userInfo,
+    }
+
     default:
       return state;
   }

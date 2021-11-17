@@ -1,34 +1,49 @@
 import React from 'react';
+import {useDispatch} from 'react-redux';
 import {Link, useLocation} from "react-router-dom";
 import {unsplash} from '../containers/authorization.jsx';
 import {disableScroll, enableScroll} from '../helpers/disable_scroll.js'
 import {format} from 'date-fns';
+import {setLikeStatus,requestResultClear} from '../redux/actions.js';
 
 let isFirst = false;
 let isLast = false;
 
 const Popup = (props) => {
-  const {state, updatePhoto} = props;
+  const {state} = props;
+  const dispatch = useDispatch();
   const location = useLocation();
+
+  let currentImage;
+  let indexOfImage;
+  let date;
+  let formatDate;
+
   let id = location.pathname.split('image/')[1];
 
-  let currentImage = state.images.find(item => item.id == id);
-  let indexOfImage = state.images.indexOf(currentImage);
+  if (state.images.length !== 0) {
+    currentImage = state.images.find(item => item.id == id);
+    indexOfImage = state.images.indexOf(currentImage);
 
-  let date = new Date(Date.parse(currentImage.created_at));
-  let formatDate = format(date, 'dd.MM.yyyy');
+    date = new Date(Date.parse(currentImage.created_at));
+    formatDate = format(date, 'dd.MM.yyyy');
 
-  switch (indexOfImage) {
-    case 0:
-      isFirst = true;
-      break;
-    case state.images.length-1:
-      isLast = true;
-      break;
-    default:
-    isFirst = false;
-    isLast = false;
+    switch (indexOfImage) {
+      case 0:
+        isFirst = true;
+        break;
+      case state.images.length-1:
+        isLast = true;
+        break;
+      default:
+      isFirst = false;
+      isLast = false;
+    }
   }
+  else {
+    return ('');
+  }
+
 
   React.useEffect(() => {
       disableScroll();
@@ -39,26 +54,11 @@ const Popup = (props) => {
     enableScroll();
   };
 
-  const toggleLike = (image) => {
-    if (!image.liked_by_user) {
-      unsplash.photos.likePhoto(image.id)
-        .then(res => res.json())
-        .then(res => {
-          if (!res.error) {
-            updatePhoto(res.photo);
-          }
-        });
-    }
-    else {
-      unsplash.photos.unlikePhoto(image.id)
-        .then(res => res.json())
-        .then(res => {
-          if (!res.error) {
-            updatePhoto(res.photo);
-          }
-        });
-    }
+  const onClickLikeBtn = (image) => {
+    dispatch(setLikeStatus(unsplash,image));
   };
+
+
 
   return (
     <div className='popupModal'>
@@ -96,14 +96,15 @@ const Popup = (props) => {
             </div>
           </div>
           {
-            currentImage.liked_by_user ? (<button aria-label='Мне нравится' className='likeBtn likeBtn_active' type='button' onClick={() => toggleLike(currentImage)}>{currentImage.likes}</button>)
-            : (<button aria-label='Мне нравится' className='likeBtn' type='button' onClick={() => toggleLike(currentImage)}>{currentImage.likes}</button>)
+            currentImage.liked_by_user ? (<button aria-label='Мне нравится' className='likeBtn likeBtn_active' type='button' onClick={() => onClickLikeBtn(currentImage)}>{currentImage.likes}</button>)
+            : (<button aria-label='Мне нравится' className='likeBtn' type='button' onClick={() => onClickLikeBtn(currentImage)}>{currentImage.likes}</button>)
           }
 
         </div>
       </div>
       <Link to='/main' className='popupPhotoContainer__closeLink' onClick={() => closePopup()}></Link>
     </div>
+
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {unsplash} from './authorization.jsx';
 import Popup from '../components/popup.jsx';
-import {Switch, Route, Link, useLocation,useHistory} from "react-router-dom";
+import {Switch, Route, Link,useHistory} from "react-router-dom";
 import {addImages, changeImageData} from '../redux/actions.js';
 import {useSelector, useDispatch} from 'react-redux';
 import Masonry from 'react-masonry-component';
@@ -11,10 +11,12 @@ let page = 1;
 const perPageItemsCount = 20;
 let photos;
 let isLoadingImagesEnable = false;
+let idFromPrevAppUpdate='';
 
 let moreImagesBtn;
 let imagesListElem;
 let positionYImagesListElem;
+
 
 const getCoordsOfElement = (elem) => {
   const element = elem.getBoundingClientRect();
@@ -39,26 +41,6 @@ function Gallery(props) {
     dispatch(addImages(photos));
   };
 
-  let id = location.pathname.split('image/')[1];
-
-  //Запрос
-  if (!state.images.length && state.userInfo) {
-    unsplash.photos.listPhotos(page, perPageItemsCount, 'latest')
-      .then(res => res.json())
-      .then(res => {
-          if (!res.errors) {
-             photos = res;
-             addPhotos(photos);
-             if (id) {
-               history.push('/main/image/' + id);
-             }
-          }
-          else {
-            console.log(res.errors);
-          }
-      });
-  }
-
 
   const loadMoreImages = () => {
     page++;
@@ -73,7 +55,28 @@ function Gallery(props) {
              console.log(res);
           }
       });
+
   };
+
+   if (location.pathname.split('image/')[1]) {
+     idFromPrevAppUpdate = location.pathname.split('image/')[1];
+   }
+
+
+  //Запрос первого запуска
+  if (!state.images.length && state.userInfo) {
+    unsplash.photos.listPhotos(page, perPageItemsCount, 'latest')
+      .then(res => res.json())
+      .then(res => {
+          if (!res.errors) {
+             photos = res;
+             addPhotos(photos);
+          }
+          else {
+            console.log(res.errors);
+          }
+      });
+  }
 
 
 
@@ -83,6 +86,21 @@ function Gallery(props) {
       positionYImagesListElem = getCoordsOfElement(ref.current).top + galleryHeight;
       isLoadingImagesEnable = true;
     },1000);
+
+    //Поиск элемента при наличии сссылки на элемент
+    if (state.images.length) {
+      if (idFromPrevAppUpdate) {
+        let findedItem = state.images.find(item => item.id == idFromPrevAppUpdate);
+        if (!findedItem) {
+          loadMoreImages();
+        }
+        else {
+          history.push('/main/image/' + idFromPrevAppUpdate);
+          idFromPrevAppUpdate = '';
+        }
+      }
+    }
+
   });
 
 
@@ -130,7 +148,7 @@ function Gallery(props) {
       </div>
 
       <Route path='/main/image'>
-        <Popup state={state}/>
+        <Popup state={state} />
       </Route>
     </main>
   );

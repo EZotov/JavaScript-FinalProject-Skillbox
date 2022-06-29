@@ -1,3 +1,5 @@
+import { loadImages, logIn, getCurrentUser } from '../api.service';
+
 const setUserInfo = (info) => {
   return {
     type: 'SET_USER_INFO',
@@ -19,6 +21,20 @@ const changeImageData = (image) => {
   };
 };
 
+const loginRequestSuccess = (token) => {
+  return {
+    type: 'SET_TOKEN',
+    token,
+  };
+};
+
+const setToken = (token) => {
+  return {
+    type: 'MANUAL_SET_TOKEN',
+    token,
+  };
+};
+
 const requestSend = () => {
   return {
     type: 'REQUEST_SENDING',
@@ -27,8 +43,7 @@ const requestSend = () => {
 
 const requestSuccess = (data) => {
   return {
-    type: 'REQUEST_SUCCESS',
-    data,
+    type: 'REQUEST_SUCCESS'
   }
 };
 
@@ -45,6 +60,7 @@ const requestResultClear = () => {
   }
 };
 
+//Async Actions
 const setLikeStatus = (unsplash, image) => {
   return (dispatch) => {
     const sourceImage = Object.assign({}, image);
@@ -56,14 +72,12 @@ const setLikeStatus = (unsplash, image) => {
       unsplash.photos.likePhoto(image.id)
         .then(res => res.json())
         .then(res => {
-          if (!res.error) {
-            dispatch(requestSuccess());
-            dispatch(changeImageData(res.photo));
-          }
-          else {
-            dispatch(requestFail(res.error));
-            dispatch(changeImageData(sourceImage));
-          }
+          dispatch(requestSuccess());
+          dispatch(changeImageData(res.photo));
+        })
+        .catch(error => {
+          dispatch(requestFail(error));
+          dispatch(changeImageData(sourceImage));
         });
     }
     else {
@@ -73,19 +87,57 @@ const setLikeStatus = (unsplash, image) => {
       unsplash.photos.unlikePhoto(image.id)
         .then(res => res.json())
         .then(res => {
-          if (!res.error) {
-              dispatch(requestSuccess());
-              dispatch(changeImageData(res.photo));
-          }
-          else {
-            dispatch(requestFail(res.error));
-            dispatch(changeImageData(sourceImage));
-          }
+            dispatch(requestSuccess());
+            dispatch(changeImageData(res.photo));
+        })
+        .catch(error => {
+          dispatch(requestFail(error));
+          dispatch(changeImageData(sourceImage));
         });
     }
   };
 
 };
 
+const addImagesRequest = (page, perPageItemsCount) => {
+  return (dispatch) => {
+    loadImages(page, perPageItemsCount)
+      .then(result => result.json())
+      .then(result => {
+        if (!result.errors) {
+          dispatch(addImages(result));
+        }
+      })
+      .catch(error => dispatch(requestFail(error)))
+  };
+};
 
-export {setUserInfo, addImages, changeImageData,setLikeStatus,requestResultClear};
+const loginRequest = (authCode) => {
+  return (dispatch) => {
+    logIn(authCode)
+      .then(result => result.json())
+      .then(result => {
+        if (!result.errors) {
+          dispatch(loginRequestSuccess(result.access_token));
+        }
+      })
+      .catch(error =>
+        dispatch(requestFail(error)));
+  };
+};
+
+const getCurrentUserRequest = (unsplash) => {
+  return (dispatch) => {
+    getCurrentUser(unsplash)
+      .then(result => result.json())
+      .then(result => {
+        if (!result.errors) {
+          return dispatch(setUserInfo(result));
+        }
+      })
+      .catch(error => dispatch(requestFail(error)));
+  };
+};
+
+
+export {changeImageData,setLikeStatus,requestResultClear, addImagesRequest, loginRequest, getCurrentUserRequest, setToken};

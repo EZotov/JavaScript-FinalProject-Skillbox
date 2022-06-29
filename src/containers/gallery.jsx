@@ -2,10 +2,11 @@ import React from 'react';
 import {unsplash} from './authorization.jsx';
 import Popup from '../components/popup.jsx';
 import {Switch, Route, Link,useHistory} from "react-router-dom";
-import {addImages, changeImageData} from '../redux/actions.js';
+import {addImagesRequest, changeImageData} from '../redux/actions.js';
 import {useSelector, useDispatch} from 'react-redux';
 import Masonry from 'react-masonry-component';
 import {format} from 'date-fns';
+import { loadImages } from '../api.service'
 
 let page = 1;
 const perPageItemsCount = 20;
@@ -32,78 +33,47 @@ function Gallery(props) {
   const {state} = props;
   const dispatch = useDispatch();
   const history = useHistory();
+  const images = useSelector(state => state.images);
   const ref = React.useRef(null);
 
   let galleryHeight;
 
-  //State Changers
   const addPhotos = (photos) => {
     dispatch(addImages(photos));
   };
 
-
   const loadMoreImages = () => {
     page++;
-    unsplash.photos.listPhotos(page, perPageItemsCount, 'latest')
-      .then(res => res.json())
-      .then(res => {
-          if (!res.errors) {
-             photos = res;
-             addPhotos(photos);
-          }
-          else {
-             console.log(res);
-          }
-      });
-
+    dispatch(addImagesRequest(page, perPageItemsCount));
   };
-
-   if (location.pathname.split('image/')[1]) {
-     idFromPrevAppUpdate = location.pathname.split('image/')[1];
-   }
-
-
-  //Запрос первого запуска
-  if (!state.images.length && state.userInfo) {
-    unsplash.photos.listPhotos(page, perPageItemsCount, 'latest')
-      .then(res => res.json())
-      .then(res => {
-          if (!res.errors) {
-             photos = res;
-             addPhotos(photos);
-          }
-          else {
-            console.log(res.errors);
-          }
-      });
-  }
-
 
 
   React.useEffect(() => {
-    setTimeout(() => {
-      galleryHeight =  ref.current.clientHeight;
-      positionYImagesListElem = getCoordsOfElement(ref.current).top + galleryHeight;
-      isLoadingImagesEnable = true;
-    },1000);
+    if (location.pathname.split('image/')[1]) {
+      idFromPrevAppUpdate = location.pathname.split('image/')[1];
+    }
 
-    //Поиск элемента при наличии сссылки на элемент
-    if (state.images.length) {
+    dispatch(addImagesRequest(page, perPageItemsCount));
+  }, []);
+
+
+  React.useEffect(() => {
+    if (images) {
+      setTimeout(() => {
+        galleryHeight =  ref.current.clientHeight;
+        positionYImagesListElem = getCoordsOfElement(ref.current).top + galleryHeight;
+        isLoadingImagesEnable = true;
+      },1000);
+
       if (idFromPrevAppUpdate) {
         let findedItem = state.images.find(item => item.id == idFromPrevAppUpdate);
-        if (!findedItem) {
-          loadMoreImages();
-        }
-        else {
+        if (findedItem) {
           history.push('/main/image/' + idFromPrevAppUpdate);
           idFromPrevAppUpdate = '';
         }
       }
     }
-
-  });
-
-
+  }, [images]);
 
 
   window.onscroll = (event) => {
@@ -111,31 +81,30 @@ function Gallery(props) {
     if (bottomWindowBorder >= positionYImagesListElem) {
       if (isLoadingImagesEnable) {
         isLoadingImagesEnable = false;
-        //Поучаем фотки
         loadMoreImages();
       }
     }
   };
 
   return (
-    <main className='main'>
-      <div className='galleryContainer'>
-        <div className='galleryBlock'  ref={ref}>
-          <div className='fixed-container'>
-            <Masonry className='imageList'
+    <main className="main">
+      <div className="galleryContainer">
+        <div className="galleryBlock"  ref={ref}>
+          <div className="fixed-container">
+            <Masonry className="imageList"
               elementType={'ul'}
               options={{isOriginTop: true, isFitWidth: true, gutter: 10}}>
               {
                 state.images.map((image) => {
                   return (
-                    <li key={image.id} className='imageListItem'>
-                      <Link to={'main/image/' + image.id} className='imageListItemWrapLink'>
-                        <img className='imageListItem__image' src={image.urls.small} alt={image.description}/>
+                    <li key={image.id} className="imageListItem">
+                      <Link to={'main/image/' + image.id} className="imageListItemWrapLink">
+                        <img className="imageListItem__image" src={image.urls.small} alt={image.description}/>
                       </Link>
-                      <div className='imageListItemHoverBlock'>
-                        <a aria-label='Профиль владельца' className='imageListItemHoverBlock__link' target='_blank' href={image.user.links.html}>{image.user.name}</a>
-                        <span className='imageListItemHoverBlock__likes'>{image.likes}</span>
-                        <span className='imageListItemHoverBlock__date'>{format(new Date(Date.parse(image.created_at)), 'dd.MM.yyyy')}</span>
+                      <div className="imageListItemHoverBlock">
+                        <a aria-label="Профиль владельца" className="imageListItemHoverBlock__link" target="_blank" href={image.user.links.html}>{image.user.name}</a>
+                        <span className="imageListItemHoverBlock__likes">{image.likes}</span>
+                        <span className="imageListItemHoverBlock__date">{format(new Date(Date.parse(image.created_at)), 'dd.MM.yyyy')}</span>
                       </div>
                     </li>
                   );
@@ -144,10 +113,10 @@ function Gallery(props) {
             </Masonry>
           </div>
         </div>
-        <button aria-label='Загрузить больше изображений' className='galleryContainer__button' type='button' onClick={() => loadMoreImages()}>Загрузить ещё</button>
+        <button aria-label='Загрузить больше изображений' className='galleryContainer__button' type='button' onClick={loadMoreImages}>Загрузить ещё</button>
       </div>
 
-      <Route path='/main/image'>
+      <Route path='/main/image/'>
         <Popup state={state} />
       </Route>
     </main>

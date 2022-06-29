@@ -1,11 +1,12 @@
 import React from 'react';
-import {Switch, Route, Link, useHistory} from "react-router-dom";
+import {Switch, Route, Link, useHistory, useLocation} from "react-router-dom";
 import Header from '../components/header.jsx';
 import {Authorization, unsplash} from './authorization.jsx';
 import Gallery from './gallery.jsx';
-import {getCookie,setCookie,delCookie} from '../cookie.js';
-import {setUserInfo,requestResultClear} from '../redux/actions.js';
+import {getCookie, setCookie, delCookie} from '../cookie.js';
+import {loginRequest, getCurrentUserRequest, requestResultClear, setToken} from '../redux/actions.js';
 import {useSelector, useDispatch} from 'react-redux';
+import { logIn } from '../api.service';
 import '../css/normalize.css';
 import '../css/primarystyles.css';
 import '../scss/app.scss';
@@ -14,84 +15,78 @@ import '../scss/media.scss';
 
 function GalleryApp(props) {
   const state = useSelector((state) => state);
+  const user = useSelector((state) => state.userInfo);
+  const token = useSelector((state) => state.token);
+  const location = useLocation();
   const history = useHistory();
   const dispatch = useDispatch();
 
-
   let authCode = window.location.search.split('code=')[1];
 
-  //State Changers
-  const setUser = (user) => {
-    dispatch(setUserInfo(user));
+  const getUnsplashToken = (authCode) => {
+    dispatch(loginRequest(authCode));
   };
-
-  let errorMessageConcate = '';
-  if (state.errorMessage) {
-    state.errorMessage.forEach((item, i) => {
-      errorMessageConcate = item + ';';
-    });
-  }
-
 
   const onClickErrorCloseBtn = () => {
     dispatch(requestResultClear());
   };
 
-  const getCurrentUser = (unsplash) => {
+  const saveCurrentUser = (unsplash) => {
     if (!state.userInfo) {
-      unsplash.currentUser.profile()
-        .then(res => res.json())
-        .then(res => {
-          if (!res.errors) {
-            setUser(res);
-            history.push('/main');
-          }
-          else {
-            console.log(res);
-          }
-        });
+      dispatch(getCurrentUserRequest(unsplash));
     }
   };
 
   let result_token;
 
-  if (result_token = getCookie('token')) {
-    unsplash.auth.setBearerToken(result_token);
-    getCurrentUser(unsplash);
-  }
-  else if (authCode) {
-    unsplash.auth.userAuthentication(authCode)
-      .then(res => res.json())
-      .then(resJSON => {
-        result_token = resJSON.access_token;
-        setCookie('token', result_token);
-        unsplash.auth.setBearerToken(result_token);
-        getCurrentUser(unsplash);
-      })
-      .catch(err => console.log('Auth err', err));
-  }
-  else {
+  React.useEffect(() => {
+    if (result_token = getCookie('token')) {
+      dispatch(setToken(result_token));
+    }
+    else if (authCode) {
+      getUnsplashToken(authCode);
+    }
+    else {
       history.push('/auth');
-  }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (user && !location.pathname.split('/')[2]) {
+      history.push('/main');
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    if (token) {
+      if (result_token !== token) {
+        setCookie('token', token);
+        result_token = token;
+        unsplash.auth.setBearerToken(result_token);
+        saveCurrentUser(unsplash);
+      }
+    }
+  }, [token]);
+
 
   return (
-    <div className='galleryApp'>
+    <div className="galleryApp">
       <Header state={state}/>
       <Route exact path='/auth'>
         <Authorization />
       </Route>
 
-      <Route path='/main'>
+      <Route path="/main">
         <Gallery state={state}/>
       </Route>
       {
-        state.errorMessage ? (
-          <div className ='errorContainer'>
-            <h2 className='errorContainer__headline'>Ошибка</h2>
-            <p className='errorContainer__errortext'>{errorMessageConcate}</p>
-            <button aria-label='Закрыть окно ошибки' type='button' className='errorContainer__accept' onClick={() => onClickErrorCloseBtn()}>ok</button>
+        state.errorMessage && (
+          <div className ="errorContainer">
+            <h2 className="errorContainer__headline">Ошибка</h2>
+            <p className="errorContainer__errortext">{state.errorMessage}</p>
+            <button aria-label="Закрыть окно ошибки" type="button" className="errorContainer__accept" onClick={onClickErrorCloseBtn}>ok</button>
           </div>
-        ): ''
+        )
       }
     </div>
   )

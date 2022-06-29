@@ -9,6 +9,7 @@ import {BrowserRouter as Router} from 'react-router-dom';
 
 let initialState = {
   images: [],
+  token : ''
 };
 
 const store = createStore(reducer, initialState, applyMiddleware(thunk));

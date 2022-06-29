@@ -12,13 +12,13 @@ function Header(props) {
   }
 
   return (
-    <header className='header'>
-      <div className='fixed-container headerContainer'>
-        <h1 className='mainHeadline'>
+    <header className="header">
+      <div className="fixed-container headerContainer">
+        <h1 className="mainHeadline">
           Unsplash
         </h1>
-        <div className='personInfo'>
-          <span className='personInfo__name'>{userInfo}</span>
+        <div className="personInfo">
+          <span className="personInfo__name">{userInfo}</span>
         </div>
       </div>
     </header>
